@@ -2,6 +2,7 @@
 	<img width="240" src="https://raw.githubusercontent.com/ulid-flake/spec/main/logo.png" alt="ulid-flake">
 </h1>
 
+
 # Ulid-Flake, A 64-bit ULID variant featuring Snowflake - the python implementation
 
 Ulid-Flake is a compact `64-bit` ULID (Universally Unique Lexicographically Sortable Identifier) variant inspired by ULID and Twitter's Snowflake. It features a 1-bit sign bit, a 43-bit timestamp, and a 20-bit randomness. Additionally, it offers a scalable version using the last 5 bits as a scalability identifier (e.g., machineID, podID, nodeID).
@@ -330,3 +331,12 @@ This project is licensed under the MIT License. See the LICENSE file for details
 [ULID](https://github.com/ulid/spec)
 
 [Twitter's Snowflake](https://blog.x.com/engineering/en_us/a/2010/announcing-snowflake)
+
+```
+██╗░░░██╗██╗░░░░░██╗██████╗░░░░░░░███████╗██╗░░░░░░█████╗░██╗░░██╗███████╗
+██║░░░██║██║░░░░░██║██╔══██╗░░░░░░██╔════╝██║░░░░░██╔══██╗██║░██╔╝██╔════╝
+██║░░░██║██║░░░░░██║██║░░██║█████╗█████╗░░██║░░░░░███████║█████═╝░█████╗░░
+██║░░░██║██║░░░░░██║██║░░██║╚════╝██╔══╝░░██║░░░░░██╔══██║██╔═██╗░██╔══╝░░
+╚██████╔╝███████╗██║██████╔╝░░░░░░██║░░░░░███████╗██║░░██║██║░╚██╗███████╗
+░╚═════╝░╚══════╝╚═╝╚═════╝░░░░░░░╚═╝░░░░░╚══════╝╚═╝░░╚═╝╚═╝░░╚═╝╚══════╝
+```
