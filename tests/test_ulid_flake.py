@@ -6,8 +6,8 @@
 import unittest
 from datetime import datetime, timezone, timedelta
 
-from ulid_flake.ulid_flake import UlidFlake
-from ulid_flake.ulid_flake_scalable import UlidFlakeScalable
+from ulid_flake.api import UlidFlake
+from ulid_flake.scalable import UlidFlakeScalable
 
 
 class TestUlidFlake(unittest.TestCase):

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ulid-flake"
-version = "0.1.1"
+version = "0.1.2"
 description = "Ulid-Flake, A 64-bit ULID variant featuring Snowflake."
 readme = "README.md"
 requires-python = ">=3.8"
