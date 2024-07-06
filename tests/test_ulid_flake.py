@@ -18,6 +18,7 @@ class TestUlidFlake(unittest.TestCase):
 
     def tearDown(self):
         """Tear down test fixtures, if any."""
+        UlidFlake.reset_config()
 
     def test_generate_ulid_flake(self):
         """Test Generate Ulid-Flake"""
@@ -37,17 +38,14 @@ class TestUlidFlake(unittest.TestCase):
         self.assertEqual(len(ulid_flake_id.base32), 13)
         self.assertEqual(len(ulid_flake_id.hex), 16)
         self.assertGreaterEqual(len(ulid_flake_id.bin), 56)
-        UlidFlake.reset_config()
 
     def test_generate_ulid_flake_with_out_of_range_entropy_size(self):
         """Test Generate Ulid-Flake with Large Entropy"""
         with self.assertRaises(ValueError):
             UlidFlake.set_config(entropy_size=0)
-        UlidFlake.reset_config()
 
         with self.assertRaises(ValueError):
             UlidFlake.set_config(entropy_size=4)
-        UlidFlake.reset_config()
 
     def test_generate_ulid_flake_with_large_entropy(self):
         """Test Generate Ulid-Flake with Large Entropy"""
@@ -56,7 +54,6 @@ class TestUlidFlake(unittest.TestCase):
         with self.assertRaises(OverflowError):
             for _ in range(3):
                 UlidFlake.new()
-        UlidFlake.reset_config()
 
     def test_parse_ulid_flake(self):
         """Test Parse Ulid-Flake"""
@@ -65,6 +62,25 @@ class TestUlidFlake(unittest.TestCase):
         self.assertEqual(ulid_flake.value, parsed_ulid_flake.value)
         self.assertEqual(ulid_flake.timestamp, parsed_ulid_flake.timestamp)
         self.assertEqual(ulid_flake.randomness, parsed_ulid_flake.randomness)
+
+    def test_instantiate_ulid_flake_with_int_value(self):
+        """Test Instantiate Ulid-Flake with Int Value"""
+        ulid_flake = UlidFlake(0)
+        self.assertEqual(ulid_flake.value, 0)
+
+        ulid_flake = UlidFlake(1)
+        self.assertEqual(ulid_flake.value, 1)
+
+        ulid_flake = UlidFlake(9223372036854775807)
+        self.assertEqual(ulid_flake.value, 9223372036854775807)
+
+    def test_instantiate_ulid_flake_with_out_of_range_int_value(self):
+        """Test Instantiate Ulid-Flake with Invalid Int Value"""
+        with self.assertRaises(OverflowError):
+            UlidFlake(-1)
+
+        with self.assertRaises(OverflowError):
+            UlidFlake(9223372036854775808)
 
     def test_parse_ulid_flake_with_invalid_base32(self):
         """Test Parse Ulid-Flake with Invalid Base32"""
@@ -95,6 +111,10 @@ class TestUlidFlake(unittest.TestCase):
         with self.assertRaises(ValueError):
             UlidFlake.parse("00CMH8K1E1E1E2")
 
+        # overflow error
+        with self.assertRaises(OverflowError):
+            UlidFlake.parse("8000000000000")
+
     def test_monotonically_increasing_ulid_flake(self):
         """Test Monotonically Increasing Ulid-Flake"""
         ulid_flake_id = UlidFlake.new()
@@ -110,6 +130,14 @@ class TestUlidFlake(unittest.TestCase):
         self.assertEqual(ulid_flake.value, ulid_flake_from_int.value)
         self.assertEqual(ulid_flake.timestamp, ulid_flake_from_int.timestamp)
         self.assertEqual(ulid_flake.randomness, ulid_flake_from_int.randomness)
+
+    def test_create_ulid_flake_from_int_with_out_of_range_value(self):
+        """Test Create Ulid-Flake from Integer with Out of Range Value"""
+        with self.assertRaises(OverflowError):
+            UlidFlake.from_int(-1)
+
+        with self.assertRaises(OverflowError):
+            UlidFlake.from_int(9223372036854775808)
 
     def test_create_ulid_flake_from_str(self):
         """Test Create Ulid-Flake from String"""
@@ -170,13 +198,11 @@ class TestUlidFlakeScalable(unittest.TestCase):
         self.assertEqual(len(ulid_flake_scalable_id.base32), 13)
         self.assertEqual(len(ulid_flake_scalable_id.hex), 16)
         self.assertGreaterEqual(len(ulid_flake_scalable_id.bin), 56)
-        UlidFlake.reset_config()
 
     def test_generate_ulid_flake_scalable_with_large_sid(self):
         """Test Generate Ulid-Flake with Large Scalability ID"""
         with self.assertRaises(ValueError):
             UlidFlakeScalable.set_config(sid=32)
-        UlidFlake.reset_config()
 
     def test_parse_ulid_flake_scalable(self):
         """Test Parse Ulid-Flake Scalable"""
@@ -186,6 +212,25 @@ class TestUlidFlakeScalable(unittest.TestCase):
         self.assertEqual(ulid_flake_scalable.timestamp, parsed_ulid_flake_scalable.timestamp)
         self.assertEqual(ulid_flake_scalable.randomness, parsed_ulid_flake_scalable.randomness)
         self.assertEqual(ulid_flake_scalable.sid, parsed_ulid_flake_scalable.sid)
+
+    def test_instantiate_ulid_flake_scalable_with_int_value(self):
+        """Test Instantiate Ulid-Flake Scalable with Int Value"""
+        ulid_flake = UlidFlakeScalable(0)
+        self.assertEqual(ulid_flake.value, 0)
+
+        ulid_flake = UlidFlakeScalable(1)
+        self.assertEqual(ulid_flake.value, 1)
+
+        ulid_flake = UlidFlakeScalable(9223372036854775807)
+        self.assertEqual(ulid_flake.value, 9223372036854775807)
+
+    def test_instantiate_ulid_flake_scalable_with_out_of_range_int_value(self):
+        """Test Instantiate Ulid-Flake Scalable with Invalid Int Value"""
+        with self.assertRaises(OverflowError):
+            UlidFlakeScalable(-1)
+
+        with self.assertRaises(OverflowError):
+            UlidFlakeScalable(9223372036854775808)
 
     def test_parse_ulid_flake_scalable_with_invalid_base32(self):
         """Test Parse Ulid-Flake Scalable with Invalid Base32"""
@@ -216,6 +261,10 @@ class TestUlidFlakeScalable(unittest.TestCase):
         with self.assertRaises(ValueError):
             UlidFlakeScalable.parse("00CMH8K1E1E1E2")
 
+        # overflow error
+        with self.assertRaises(OverflowError):
+            UlidFlake.parse("8000000000000")
+
     def test_monotonically_increasing_ulid_flake_scalable(self):
         """Test Monotonically Increasing Ulid-Flake Scalable"""
         ulid_flake_scalable = UlidFlakeScalable.new()
@@ -225,15 +274,23 @@ class TestUlidFlakeScalable(unittest.TestCase):
             ulid_flake_scalable = new_ulid_flake_scalable
 
     def test_create_ulid_flake_scalable_from_int(self):
-        """Test Create Ulid-Flake from Integer"""
+        """Test Create Ulid-Flake Scalable from Integer"""
         ulid_flake = UlidFlakeScalable.new()
         ulid_flake_from_int = UlidFlakeScalable.from_int(ulid_flake.value)
         self.assertEqual(ulid_flake.value, ulid_flake_from_int.value)
         self.assertEqual(ulid_flake.timestamp, ulid_flake_from_int.timestamp)
         self.assertEqual(ulid_flake.randomness, ulid_flake_from_int.randomness)
 
+    def test_create_ulid_flake_scalable_from_int_with_out_of_range_value(self):
+        """Test Create Ulid-Flake Scalable from Integer with Out of Range Value"""
+        with self.assertRaises(OverflowError):
+            UlidFlake.from_int(-1)
+
+        with self.assertRaises(OverflowError):
+            UlidFlake.from_int(9223372036854775808)
+
     def test_create_ulid_flake_scalable_from_str(self):
-        """Test Create Ulid-Flake from String"""
+        """Test Create Ulid-Flake Scalable from String"""
         ulid_flake = UlidFlakeScalable.new()
         ulid_flake_from_str = UlidFlakeScalable.from_str(ulid_flake.base32)
         self.assertEqual(ulid_flake.value, ulid_flake_from_str.value)
@@ -241,7 +298,7 @@ class TestUlidFlakeScalable(unittest.TestCase):
         self.assertEqual(ulid_flake.randomness, ulid_flake_from_str.randomness)
 
     def test_create_ulid_flake_scalable_from_unix_epoch_time(self):
-        """Test Create Ulid-Flake from Unix Epoch Time"""
+        """Test Create Ulid-Flake Scalable from Unix Epoch Time"""
         custom_epoch = datetime(2024, 1, 1, tzinfo=timezone.utc)
         ulid_flake = UlidFlakeScalable.new()
         ulid_flake_timestamp = ulid_flake.timestamp
@@ -252,7 +309,7 @@ class TestUlidFlakeScalable(unittest.TestCase):
         self.assertEqual(ulid_flake.sid, ulid_flake_from_unix_epoch_time.sid)
 
     def test_create_ulid_flake_scalable_from_unix_epoch_time_before_custom_epoch(self):
-        """Test Create Ulid-Flake from Unix Epoch Time Before Custom Epoch"""
+        """Test Create Ulid-Flake Scalable from Unix Epoch Time Before Custom Epoch"""
         custom_epoch = datetime(2024, 1, 1, tzinfo=timezone.utc)
         ulid_flake = UlidFlakeScalable.new()
         ulid_flake_timestamp = ulid_flake.timestamp
@@ -261,7 +318,7 @@ class TestUlidFlakeScalable(unittest.TestCase):
             UlidFlakeScalable.from_unix_epoch_time(unix_timestamp)
 
     def test_create_ulid_flake_scalable_from_unix_epoch_time_after_max_timestamp(self):
-        """Test Create Ulid-Flake from Unix Epoch Time After Max Timestamp"""
+        """Test Create Ulid-Flake Scalable from Unix Epoch Time After Max Timestamp"""
         max_timestamp = (1 << 43) - 1  # 43-bit maximum value
         custom_epoch = datetime(2024, 1, 1, tzinfo=timezone.utc)
         unix_timestamp = (custom_epoch + timedelta(milliseconds=max_timestamp + 1)).timestamp()
@@ -269,6 +326,6 @@ class TestUlidFlakeScalable(unittest.TestCase):
             UlidFlakeScalable.from_unix_epoch_time(unix_timestamp)
 
     def test_create_ulid_flake_scalable_from_unix_epoch_time_with_invalid_unix_time(self):
-        """Test Create Ulid-Flake from Unix Epoch Time with Invalid Unix Time"""
+        """Test Create Ulid-Flake Scalable from Unix Epoch Time with Invalid Unix Time"""
         with self.assertRaises(ValueError):
             UlidFlakeScalable.from_unix_epoch_time("invalid-time")

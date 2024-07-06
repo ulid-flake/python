@@ -7,18 +7,27 @@
 import os
 import threading
 from datetime import datetime, timezone
-from .consts import DEFAULT_EPOCH, MAX_TIMESTAMP, MAX_RANDOMNESS, DEFAULT_ENTROPY_SIZE, MAX_ENTROPY_SIZE
+from .consts import (
+    DEFAULT_EPOCH,
+    MIN_INT, MAX_INT,
+    MAX_TIMESTAMP,
+    MAX_RANDOMNESS,
+    MIN_ENTROPY_SIZE, MAX_ENTROPY_SIZE,
+    ULID_FLAKE_LEN,
+)
 from . import base32
 
 
 class UlidFlake:
     epoch_time = DEFAULT_EPOCH
-    entropy_size = DEFAULT_ENTROPY_SIZE
+    entropy_size = MIN_ENTROPY_SIZE
     previous_timestamp = None
     previous_randomness = None
     lock = threading.Lock()
 
     def __init__(self, value):
+        if value < MIN_INT or value > MAX_INT:
+            raise OverflowError("Value exceeds the allowable Ulid-Flake range.")
         self.value = value
 
     def __str__(self):
@@ -38,7 +47,7 @@ class UlidFlake:
 
     @property
     def base32(self):
-        return base32.encode(self.value, 13)
+        return base32.encode(self.value, ULID_FLAKE_LEN)
 
     @property
     def timestamp(self):
@@ -49,7 +58,7 @@ class UlidFlake:
         return self.value & MAX_RANDOMNESS
 
     @classmethod
-    def set_config(cls, epoch_time=DEFAULT_EPOCH, entropy_size=DEFAULT_ENTROPY_SIZE):
+    def set_config(cls, epoch_time=DEFAULT_EPOCH, entropy_size=MIN_ENTROPY_SIZE):
         if entropy_size <= 0 or entropy_size > MAX_ENTROPY_SIZE:
             raise ValueError(f"Entropy size must be between 1 and {MAX_ENTROPY_SIZE}.")
 
@@ -59,7 +68,7 @@ class UlidFlake:
     @classmethod
     def reset_config(self):
         self.epoch_time = DEFAULT_EPOCH
-        self.entropy_size = DEFAULT_ENTROPY_SIZE
+        self.entropy_size = MIN_ENTROPY_SIZE
 
     @classmethod
     def generate_timestamp(cls):
@@ -75,7 +84,7 @@ class UlidFlake:
         return int.from_bytes(os.urandom(3), byteorder="big") & MAX_RANDOMNESS
 
     @classmethod
-    def generate_entropy(cls, size=DEFAULT_ENTROPY_SIZE):
+    def generate_entropy(cls, size=MIN_ENTROPY_SIZE):
         """Generate an entropy value to increment randomness."""
         if size <= 0 or size > MAX_ENTROPY_SIZE:  # Ensure entropy size is within a reasonable range
             raise ValueError(f"Entropy size must be between 1 and {MAX_ENTROPY_SIZE}.")
@@ -107,23 +116,31 @@ class UlidFlake:
             # Combine the sign bit, timestamp, and randomness
             combined = (sign_bit << 63) | (timestamp << 20) | randomness
 
+            if combined > MAX_INT:
+                raise OverflowError("Value exceeds the allowable Ulid-Flake range.")
+
             return cls(combined)
 
     @classmethod
     def parse(cls, ulid_flake_string):
         """Parse a Ulid-Flake string to create a Ulid-Flake instance."""
-        if len(ulid_flake_string) != 13:
-            raise ValueError("Ulid-Flake string must be 13 characters long.")
+        if len(ulid_flake_string) != ULID_FLAKE_LEN:
+            raise ValueError(f"Ulid-Flake string must be {ULID_FLAKE_LEN} characters long.")
         try:
             value = base32.decode(ulid_flake_string.upper())
         except ValueError:
             raise ValueError("Ulid-Flake string contains invalid Base32 characters.")
+
+        if value < MIN_INT or value > MAX_INT:
+            raise OverflowError("Parsed value exceeds the allowable Ulid-Flake range.")
 
         return cls(value)
 
     @classmethod
     def from_int(cls, value):
         """Create a Ulid-Flake instance from an integer."""
+        if value < MIN_INT or value > MAX_INT:
+            raise OverflowError("Integer value exceeds the allowable Ulid-Flake range.")
         return cls(value)
 
     @classmethod
