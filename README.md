@@ -77,7 +77,7 @@ print(f"Binary: {flake_id.bin}")
 # Binary: 0b111011111100100110011000011000101100100001100010100000
 ```
 
-## Monotonicity Testing
+## Monotonicity Testing In the Same Millisecond
 
 Stand-alone version:
 
